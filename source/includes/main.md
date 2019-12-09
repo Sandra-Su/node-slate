@@ -1,171 +1,619 @@
-# Introduction
+# Autenticación
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+La autenticación del API de Smart CM es proporcionada por el API Key generado al crear una fuente. Los tokens adicionales de autenticación se encuentran dentro de nuestra plataforma.
 
-We have language bindings in Shell, Ruby, and Python! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+# QR
 
-This example API documentation page was created with [Slate](https://github.com/lord/slate). Feel free to edit it and use it as a base for your own API's documentation.
-
-# Authentication
-
-> To authorize, use this code:
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-```
-
-```bash
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
-```
+## Generación QR Síncrono
 
 ```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
+const axios = require('axios');
+const url = 'https://api.qa.scmfix.com/lotes/mc/qr/sync';
+const config = {
+  headers: {
+    'Content-Type': 'application/json',
+    'SCM-Token': 'TOKEN GENERADO',
+    'SCM-Modo-Ejecucion': 'PR'
+  }
+}
+const body = {
+  idLote: 'lote100',
+  idMensaje: '129300-1',
+  monto: 1234.78,
+  concepto: 'Prueba1',
+  refrenciaNumerica: 12345,
+  tipoPago: 20,
+  fechaSolicitud: '1573590949',
+  fechaVencimiento: '1573590949',
+  informacionAdicional: {
+    campoPrueba: 'Valor 1'
+  },
+  nombreBeneficiario2: 'NA',
+  tipoCuentaBeneficiario2: 'NA',
+  cuentaBeneficiario2: 'NA'
+}
+axios.post(
+  url,
+  body,
+  config
+)
+  .then(...)
+  .catch(...)
 ```
 
-> Make sure to replace `meowmeowmeow` with your API key.
-
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](https://example.com/developers).
-
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
-
-`Authorization: meowmeowmeow`
-
-<aside class=notice>
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-
-# Kittens
-
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
-
-```bash
-curl "https://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
-```
-
-> The above command returns JSON structured like this:
-
-```json
-[
-   {
-      "id":         1,
-      "name":       "Fluffums",
-      "breed":      "calico",
-      "fluffiness": 6,
-      "cuteness":   7
-   },
-   {
-      "id":         2,
-      "name":       "Max",
-      "breed":      "unknown",
-      "fluffiness": 5,
-      "cuteness":   10
-   }
-]
-```
-
-This endpoint retrieves all kittens.
-
-### HTTP Request
-
-`GET https://example.com/api/kittens`
-
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
-
-<aside class=success>
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```bash
-curl "https://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
-```
-
-> The above command returns JSON structured like this:
+> Response
 
 ```json
 {
-   "id":         2,
-   "name":       "Max",
-   "breed":      "unknown",
-   "fluffiness": 5,
-   "cuteness":   10
+  "codigoResultado": 200,
+  "textoResultado": "QR Generado",
+  "fechaProcesamiento": "1573590949",
+  "idLote": "lote100",
+  "idMensaje": "129300-1",
+  "mcQR": {
+    "Mensaje de cobro tipo JSON para desplegar el QR"
+  },
+  "imageMCQR": "IMAGEN DEL QR EN BASE 64"
 }
 ```
 
-This endpoint retrieves a specific kitten.
+Endpoint que permite la generación de QRs de manera síncrona
 
-<aside class=warning>
-Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.
+
+### HTTP Request
+
+`POST https://api.qa.scmfix.com/lotes/mc/qr/sync`
+
+### Headers
+
+Header | Tipo | Requerido | Valor
+------ | ---- | --------- | -----
+Content-Type | string | ***true*** | application/json
+SCM-Token | string | ***true*** | APP_TOKEN
+SCM-Modo-Ejecucion | string | ***true*** | BL Ejecución del primer bloque con respuesta correcta dummy<br>UN Primer bloque ejecutado, siguiente en modo BL<br>IN Ejecucion de todos los procesos, sin persistencia de datos<br>PR Producción
+
+### POST Body
+
+Atributo | Descripcion | Tipo
+-------- | ----------- | ----
+idLote | Id del Lote en el que se generó el QR | ***string***
+idMensaje | Id del mensaje de cobro asociado al QR generado | ***string***
+monto | Monto a cobrar | ***number***
+concepto | Concepto de cobro | ***string***
+referenciaNumerica | Referencia numérica para la identifcación del cobro | ***number***
+tipoPago | Tipo de cuenta a la que se realizará el pago | ***number***
+fechaSolicitud | Fecha de generación del QR | ***UNIX DATE***
+fechaVencimiento | Fecha límite de vigencia del QR generado | ***UNIX DATE***
+informacionAdicional | Campos adicionales de informacion | ***json***
+nombreBeneficiario2 | Nombre del beneficiario (Solo en tipo 22) | ***string***
+tipoCuentaBeneficiario2 | Tipo de cuenta de beneficiario (Solo en tipo 22) | ***number***
+cuentaBeneficiaro2 | Número de cuenta de beneficiario (Solo en tipo 22) | ***string***
+
+<aside class="success">
+Recuerda, siempre debes de agregar el token generado de tu aplicación para realizar una petición a SCM API
 </aside>
 
-### HTTP Request (with ID)
+## Consulta QR Síncrono
 
-`GET https://example.com/kittens/<ID>`
+```javascript
+const axios = require('axios');
+const url = 'https://api.qa.scmfix.com/lotes/lote3/mc/127010-1/qr/sync?page=3&size=3';
+const config = {
+  headers: {
+    'SCM-Token': '************',
+    'SCM-Modo-Ejecucion': 'PR'
+  },
+  params: {
+    page: '3',
+    size: '3'
+  }
+}
+axios.get(
+  url,
+  config
+)
+  .then(...)
+  .catch(...)
+```
 
-### URL Parameters
+> Reponse
 
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
+```json
+{
+  "idLote": "lote3",
+  "lista": [
+    {
+      "idMensaje": "127010-1",
+      "estadoMensaje": "Procesado",
+      "horaProcesamientoMC": "2012-04-23T18:25:43.511Z",
+      "informacionAdicional": { "campoPrueba": "Prueba" }
+    }
+  ],
+  "size": 3,
+  "page": 3,
+  "codigoResultado": 200,
+  "textoResultado": "Success"
+}
+```
+
+Este endpoint te permite consultar un QR Síncrono por su ID
+
+### HTTP Request
+
+`GET https://api.qa.scmfix.com/lotes/{idLote}/mc/{idMensaje}/qr/sync?page={page}&size={size}`
+
+### Headers
+
+Header | Tipo | Requerido | Valor
+------ | ---- | --------- | -----
+SCM-Token | string | ***true*** | APP_TOKEN
+SCM-Modo-Ejecucion | string | ***true*** | BL Ejecución del primer bloque con respuesta correcta dummy<br>UN Primer bloque ejecutado, siguiente en modo BL<br>IN Ejecucion de todos los procesos, sin persistencia de datos<br>PR Producción
+
+### Path Params
+
+Param | Descripcion | Requerido
+----- | ----------- | ---------
+idLote | ID de Lote a consultar | ***true***
+idMensaje | ID de mensaje a consultar | ***true***
+
+### Query Params
+
+Param | Descripcion | Requerido
+----- | ----------- | ---------
+page | Pagina a consultar | ***false***
+size | Número de elementos a mostrar en la página actual | ***false***
+
+## Envío de Lote de Mensaje de Cobro
+
+```javascript
+const axios = require('axios');
+const url = 'https://api.qa.scmfix.com/lotes/mc/qr/sync';
+const config = {
+  headers: {
+    'Content-Type': 'application/json',
+    'SCM-Token': 'TOKEN GENERADO',
+    'SCM-Modo-Ejecucion': 'PR'
+  }
+}
+const body = {
+  idLote: 'lote100',
+  tipoPago: 20,
+  fechaSolicitud: '2012-04-23T18:25:43.511Z',
+  lote: [
+    {
+      idMensaje: "129300-1",
+      celularComprador: "5555555555",
+      refrenciaNumerica: 1234567,
+      concepto: "Pago SCM",
+      fechaVencimiento: "2012-04-23T18:25:43.511Z",
+      monto: 123.45,
+      nombreCuentaBeneficairio2: "NA",
+      tipoCuentaBeneficiario2: "NA",
+      cuentaBeneficiario2: "NA",
+      informacionAdicional: {
+        campoPrueba: "Prueba2"
+      }
+    }
+  ]
+}
+axios.post(
+  url,
+  body,
+  config
+)
+  .then(...)
+  .catch(...)
+```
+
+> Reponse
+
+```json
+{
+  "idLote": "lote3",
+  "totalMensajes": 12,
+  "codigoResultado": 200,
+  "textoResultado": "Success",
+  "fechaProcesamiento": "2012-04-23T18:25:43.511Z",
+}
+```
+
+Endpoint que permite el envío de Lotes de Mensajes de cobro de manera masiva
+
+### Headers
+
+Header | Tipo | Requerido | Valor
+------ | ---- | --------- | -----
+Content-Type | string | ***true*** | application/json
+SCM-Token | string | ***true*** | APP_TOKEN
+SCM-Modo-Ejecucion | string | ***true*** | BL Ejecución del primer bloque con respuesta correcta dummy<br>UN Primer bloque ejecutado, siguiente en modo BL<br>IN Ejecucion de todos los procesos, sin persistencia de datos<br>PR Producción
+
+### POST Body
+
+Atributo | Descripcion | Tipo
+-------- | ----------- | ----
+idLote | Id del Lote en el que se generó el QR | ***string***
+idMensaje | Id del mensaje de cobro asociado al QR generado | ***string***
+celularComprador | Celular del comprador que recibirá el mensaje de cobro | ***string***
+monto | Monto a cobrar | ***number***
+concepto | Concepto de cobro | ***string***
+referenciaNumerica | Referencia numérica para la identifcación del cobro | ***number***
+tipoPago | Tipo de cuenta a la que se realizará el pago | ***number***
+fechaSolicitud | Fecha de generación del QR | ***DATE***
+fechaVencimiento | Fecha límite de vigencia del QR generado | ***DATE***
+informacionAdicional | Campos adicionales de informacion | ***json***
+nombreBeneficiario2 | Nombre del beneficiario (Solo en tipo 22) | ***string***
+tipoCuentaBeneficiario2 | Tipo de cuenya de beneficiario (Solo en tipo 22) | ***number***
+cuentaBeneficiaro2 | Número de cueta de beneficiario (Solo en tipo 22) | ***string***
+
+## Consulta Mensaje de Cobro Síncrono
+
+```javascript
+const axios = require('axios');
+const url = 'https://api.qa.scmfix.com/lotes/{idLote}/mc/{idMensaje}/sync';
+const config = {
+  headers: {
+    'SCM-Token': 'TOKEN GENERADO',
+    'SCM-Modo-Ejecucion': 'PR'
+  }
+}
+axios.post(
+  url,
+  config
+)
+  .then(...)
+  .catch(...)
+```
+
+> Reponse
+
+```json
+{
+  "idLote": "lote3",
+   "idMensaje": "127010-1",
+   "estadoMensaje": "Procesado",
+   "horaProcesamientoMC": "2012-04-23T18:25:43.511Z",
+   "informacionAdicional": { "campoPrueba": "Prueba" }
+  "codigoResultado": 200,
+  "textoResultado": "Success"
+}
+```
+Endpoint que permite la consulta de mensajes de Cobro Push de manera síncrona.
+
+### HTTP Request
+
+`GET https://api.qa.scmfix.com/lotes/{idLote}/mc/{idMensaje}/sync `
+
+### Headers
+
+Header | Tipo | Requerido | Valor
+------ | ---- | --------- | -----
+SCM-Token | string | ***true*** | APP_TOKEN
+SCM-Modo-Ejecucion | string | ***true*** | BL Ejecución del primer bloque con respuesta correcta dummy<br>UN Primer bloque ejecutado, siguiente en modo BL<br>IN Ejecucion de todos los procesos, sin persistencia de datos<br>PR Producción
+
+
+### Path Params
+
+Param | Descripcion | Requerido
+----- | ----------- | ---------
+idLote | ID de Lote a consultar | ***true***
+idMensaje | ID de mensaje a consultar | ***true***
+
+## Consulta Mensaje de Cobro Asíncrono
+
+```javascript
+const axios = require('axios');
+const url = 'https://api.qa.scmfix.com/lotes/{idLote}/mc/{idMensaje}';
+const config = {
+  headers: {
+    'SCM-Token': 'TOKEN GENERADO',
+    'SCM-Modo-Ejecucion': 'PR'
+  }
+}
+axios.post(
+  url,
+  config
+)
+  .then(...)
+  .catch(...)
+```
+
+> Reponse
+
+```json
+{
+  "idLote": "lote3",
+   "idMensaje": "127010-1",
+   "fechaProcesamiento": "2012-04-23T18:25:43.511Z",
+  "codigoResultado": 200,
+  "textoResultado": "Success"
+}
+```
+Endpoint que permite la consulta de Mensajes de Cobro Push de manera asíncrona.
+
+### HTTP Request
+
+`GET  https://api.qa.scmfix.com/lotes/{idLote}/mc/{idMensaje}`
+
+### Headers
+
+Header | Tipo | Requerido | Valor
+------ | ---- | --------- | -----
+SCM-Token | string | ***true*** | APP_TOKEN
+SCM-Modo-Ejecucion | string | ***true*** | BL Ejecución del primer bloque con respuesta correcta dummy<br>UN Primer bloque ejecutado, siguiente en modo BL<br>IN Ejecucion de todos los procesos, sin persistencia de datos<br>PR Producción
+
+
+### Path Params
+
+Param | Descripcion | Requerido
+----- | ----------- | ---------
+idLote | ID de Lote a consultar | ***true***
+idMensaje | ID de mensaje a consultar | ***true***
+
+## Envía Respuesta
+
+```javascript
+const axios = require('axios');
+const url = '{URL}/resultadosSCM';
+const config = {
+  headers: {
+    'Content-Type': 'application/json',
+    'SCM-Token': 'TOKEN GENERADO',
+    'SCM-Modo-Ejecucion': 'PR'
+  }
+}
+const body = {
+  idLote: 'lote3',
+  idMensaje: '1234567891-2',
+  estadoMensaje: 'Procesado',
+  horaProcesamientoMC: '2012-04-23T18:25:43.511Z',
+  informacionAdicional: {campoPrueba: 'Probando'},
+  signature: 'ASDFASDFASDFASDFASDFDFASSDFASDASF'
+
+}
+axios.post(
+  url,
+  body,
+  config
+)
+  .then(...)
+  .catch(...)
+```
+
+> Response
+
+```json
+{
+  "codigoResultado": 200,
+  "textoResultado": "Succes"
+}
+```
+Endpoint que permite el envío de respuesta de un mensaje de cobro 
+
+### HTTP Request
+
+`POST {URL}/resultadoSCM`
+
+### Headers
+
+Header | Tipo | Requerido | Valor
+------ | ---- | --------- | -----
+Content-Type | string | ***true*** | application/json
+SCM-Token | string | ***true*** | APP_TOKEN
+SCM-Modo-Ejecucion | string | ***true*** | BL Ejecución del primer bloque con respuesta correcta dummy<br>UN Primer bloque ejecutado, siguiente en modo BL<br>IN Ejecucion de todos los procesos, sin persistencia de datos<br>PR Producción
+
+### POST Body
+
+Atributo | Descripcion | Tipo
+-------- | ----------- | ----
+idLote | Id del Lote en el que se generó el QR | ***string***
+idMensaje | Id del mensaje de cobro asociado al QR generado | ***string***
+estadoMensaje | Estado de mensaje de cobro | ***string***
+horaProcesamientoMC | Hora de procesamiento de Mensaje de Cobro |  ***DATE***
+informacionAdicional | Campos adicionales de informacion | ***json***
+signature | Cadena de seguridad | ***string***
+
+## Envía Respuesta QR
+
+```javascript
+const axios = require('axios');
+const url = '{URL}/resultadosSCM/qr';
+const config = {
+  headers: {
+    'Content-Type': 'application/json',
+    'SCM-Token': 'TOKEN GENERADO',
+    'SCM-Modo-Ejecucion': 'PR'
+  }
+}
+const body = {
+  idLote: 'lote3',
+  lista: [
+     {
+         idMensaje: '1234567891-2',
+         estadoMensaje: 'Procesado',
+         horaProcesamientoMC: '2012-04-23T18:25:43.511Z',
+         informacionAdicional: {campoPrueba: 'Probando'},
+     }
+  ]
+}
+axios.post(
+  url,
+  body,
+  config
+)
+  .then(...)
+  .catch(...)
+```
+
+> Response
+
+```json
+{
+  "codigoResultado": 200,
+  "textoResultado": "Succes"
+}
+```
+Endpoint que permite el envío de respuesta de QRs
+
+### HTTP Request
+
+`POST {URL}/resultadosSCM/qr`
+
+### Headers
+
+Header | Tipo | Requerido | Valor
+------ | ---- | --------- | -----
+Content-Type | string | ***true*** | application/json
+SCM-Token | string | ***true*** | APP_TOKEN
+SCM-Modo-Ejecucion | string | ***true*** | BL Ejecución del primer bloque con respuesta correcta dummy<br>UN Primer bloque ejecutado, siguiente en modo BL<br>IN Ejecucion de todos los procesos, sin persistencia de datos<br>PR Producción
+
+### POST Body
+
+Atributo | Descripcion | Tipo
+-------- | ----------- | ----
+idLote | Id del Lote en el que se generó el QR | ***string***
+idMensaje | Id del mensaje de cobro asociado al QR generado | ***string***
+estadoMensaje | Estado de mensaje de cobro | ***string***
+horaProcesamientoMC | Hora de procesamiento de Mensaje de Cobro |  ***DATE***
+informacionAdicional | Campos adicionales de informacion | ***json***
+signature | Cadena de seguridad | ***string***
+
+## Generación QR asíncrono
+
+```javascript
+const axios = require('axios');
+const url = 'https://api.qa.scmfix.com/lotes/mc/qr';
+const config = {
+  headers: {
+    'Content-Type': 'application/json',
+    'SCM-Token': 'TOKEN GENERADO',
+    'SCM-Modo-Ejecucion': 'PR'
+  }
+}
+const body = {
+  idLote: 'lote3',
+  idMensaje: '1234567891-2',
+  monto: 123.45,
+  concepto: 'Pago Codi',
+  refrenciaNumerica: 12323,
+  tipoPago: 20,
+  fechaSolicitud: '2012-04-23T18:25:43.511Z',
+  fechaVencimiento: '2012-04-23T18:25:43.511Z',
+  informacionAdicional: {
+    campoPrueba: 'Probando...'
+  },
+  nombreBeneficiario2: 'NA',
+  tipoCuentaBeneficiario2: 'NA',
+  cuentaBeneficiario2: 'NA'
+}
+axios.post(
+  url,
+  body,
+  config
+)
+  .then(...)
+  .catch(...)
+```
+
+> Response
+
+```json
+{
+   "idLote": "lote3",
+   "idMensaje": "1234567891-2",
+   "codigoResultado": 200,
+   "textoResultado": "Success",
+   "fechaProcesamiento": "2012-04-23T18:25:43.511Z",
+}
+```
+
+Endpoint que permite la generación de QRs de manera asíncrona
+
+
+### HTTP Request
+
+`POST https://api.qa.scmfix.com/lotes/mc/qr`
+
+### Headers
+
+Header | Tipo | Requerido | Valor
+------ | ---- | --------- | -----
+Content-Type | string | ***true*** | application/json
+SCM-Token | string | ***true*** | APP_TOKEN
+SCM-Modo-Ejecucion | string | ***true*** | BL Ejecución del primer bloque con respuesta correcta dummy<br>UN Primer bloque ejecutado, siguiente en modo BL<br>IN Ejecucion de todos los procesos, sin persistencia de datos<br>PR Producción
+
+### POST Body
+
+Atributo | Descripcion | Tipo
+-------- | ----------- | ----
+idLote | Id del Lote en el que se generó el QR | ***string***
+idMensaje | Id del mensaje de cobro asociado al QR generado | ***string***
+monto | Monto a cobrar | ***number***
+concepto | Concepto de cobro | ***string***
+referenciaNumerica | Referencia numérica para la identifcación del cobro | ***number***
+tipoPago | Tipo de cuenta a la que se realizará el pago | ***number***
+fechaSolicitud | Fecha de generación del QR | ***UNIX DATE***
+fechaVencimiento | Fecha límite de vigencia del QR generado | ***UNIX DATE***
+informacionAdicional | Campos adicionales de informacion | ***json***
+nombreBeneficiario2 | Nombre del beneficiario (Solo en tipo 22) | ***string***
+tipoCuentaBeneficiario2 | Tipo de cuenya de beneficiario (Solo en tipo 22) | ***number***
+cuentaBeneficiaro2 | Número de cueta de beneficiario (Solo en tipo 22) | ***string***
+
+## Consulta QR asíncrono
+
+```javascript
+const axios = require('axios');
+const url = 'https://api.qa.scmfix.com/lotes/{idLote}/mc/{idMensaje}/qr?page={page}&amp;size={size}';
+const config = {
+  headers: {
+    'SCM-Token': '************',
+    'SCM-Modo-Ejecucion': 'PR'
+  },
+  params: {
+    page: '1',
+    size: '10'
+  }
+}
+axios.get(
+  url,
+  config
+)
+  .then(...)
+  .catch(...)
+```
+
+> Response
+```json
+{
+  "idLote": "lote3",
+  "idMensaje": "1234567891-2",    
+  "codigoResultado": 200,
+  "textoResultado": "Success",
+  "fechaProcesamientoMC": "2012-04-23T18:25:43.511Z"
+}
+```
+Endpoint que permite la consulta de QRs de manera asíncrona
+
+### HTTP Request
+
+`GET https://api.qa.scmfix.com/lotes/{idLote}/mc/{idMensaje}/qr?page={page}&amp;size={size}`
+
+### Headers
+
+Header | Tipo | Requerido | Valor
+------ | ---- | --------- | -----
+SCM-Token | string | ***true*** | APP_TOKEN
+SCM-Modo-Ejecucion | string | ***true*** | BL Ejecución del primer bloque con respuesta correcta dummy<br>UN Primer bloque ejecutado, siguiente en modo BL<br>IN Ejecucion de todos los procesos, sin persistencia de datos<br>PR Producción
+
+### Path Params
+
+Param | Descripcion | Requerido
+----- | ----------- | ---------
+idLote | ID de Lote a consultar | ***true***
+idMensaje | ID de mensaje a consultar | ***true***
+
+### Query Params
+
+Param | Descripcion | Requerido
+----- | ----------- | ---------
+page | Pagina a consultar | ***false***
+size | Número de elementos a mostrar en la página actual | ***false***
