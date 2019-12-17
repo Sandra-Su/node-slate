@@ -21,7 +21,7 @@ const body = {
   idMensaje: '129300-1',
   monto: 1234.78,
   concepto: 'Prueba1',
-  refrenciaNumerica: 12345,
+  referenciaNumerica: 12345,
   tipoPago: 20,
   fechaSolicitud: '1573590949',
   fechaVencimiento: '1573590949',
@@ -183,7 +183,7 @@ const body = {
     {
       idMensaje: "129300-1",
       celularComprador: "5555555555",
-      refrenciaNumerica: 1234567,
+      referenciaNumerica: 1234567,
       concepto: "Pago SCM",
       fechaVencimiento: "2012-04-23T18:25:43.511Z",
       monto: 123.45,
@@ -232,18 +232,9 @@ SCM-Modo-Ejecucion | string | ***true*** | BL Ejecución del primer bloque con r
 Atributo | Descripcion | Tipo
 -------- | ----------- | ----
 idLote | Id del Lote en el que se generó el QR | ***string***
-idMensaje | Id del mensaje de cobro asociado al QR generado | ***string***
-celularComprador | Celular del comprador que recibirá el mensaje de cobro | ***string***
-monto | Monto a cobrar | ***number***
-concepto | Concepto de cobro | ***string***
-referenciaNumerica | Referencia numérica para la identifcación del cobro | ***number***
 tipoPago | Tipo de cuenta a la que se realizará el pago | ***number***
 fechaSolicitud | Fecha de generación del QR | ***DATE***
-fechaVencimiento | Fecha límite de vigencia del QR generado | ***DATE***
-informacionAdicional | Campos adicionales de informacion | ***json***
-nombreBeneficiario2 | Nombre del beneficiario (Solo en tipo 22) | ***string***
-tipoCuentaBeneficiario2 | Tipo de cuenya de beneficiario (Solo en tipo 22) | ***number***
-cuentaBeneficiaro2 | Número de cueta de beneficiario (Solo en tipo 22) | ***string***
+lote | Arreglo de objetos del tipo Mensaje Cobro | ***Array***
 
 ## Consulta Mensaje de Cobro Síncrono
 
@@ -272,7 +263,7 @@ axios.post(
    "idMensaje": "127010-1",
    "estadoMensaje": "Procesado",
    "horaProcesamientoMC": "2012-04-23T18:25:43.511Z",
-   "informacionAdicional": { "campoPrueba": "Prueba" }
+   "informacionAdicional": { "campoPrueba": "Prueba" },
   "codigoResultado": 200,
   "textoResultado": "Success"
 }
@@ -433,7 +424,8 @@ const body = {
          horaProcesamientoMC: '2012-04-23T18:25:43.511Z',
          informacionAdicional: {campoPrueba: 'Probando'},
      }
-  ]
+  ],
+  signature: 'ASDFASDFASDFADSFSDFADSFASDFADSFADSf'
 }
 axios.post(
   url,
@@ -471,10 +463,7 @@ SCM-Modo-Ejecucion | string | ***true*** | BL Ejecución del primer bloque con r
 Atributo | Descripcion | Tipo
 -------- | ----------- | ----
 idLote | Id del Lote en el que se generó el QR | ***string***
-idMensaje | Id del mensaje de cobro asociado al QR generado | ***string***
-estadoMensaje | Estado de mensaje de cobro | ***string***
-horaProcesamientoMC | Hora de procesamiento de Mensaje de Cobro |  ***DATE***
-informacionAdicional | Campos adicionales de informacion | ***json***
+lista | Arreglo de objetos de tipo Respuesta Mensaje Cobro | ***Array***
 signature | Cadena de seguridad | ***string***
 
 ## Generación QR asíncrono
@@ -617,3 +606,165 @@ Param | Descripcion | Requerido
 ----- | ----------- | ---------
 page | Pagina a consultar | ***false***
 size | Número de elementos a mostrar en la página actual | ***false***
+
+# Objetos Comunes 
+
+La siguiente sección es para presentar la definición de los objetos utilizados.
+
+## Generación QR
+
+```
+{
+  idLote: 'lote100',
+  idMensaje: 'mensaje1',
+  monto: 345.50,
+  concepto: 'pago',
+  referenciaNumerica: 123456789,
+  tipoPago: 20,
+  fechaSolicitud: '1573590949',
+  fechaVencimiento: '1573590949',
+  informacionAdicional: {
+    campoPrueba: 'Probando',
+    .
+    .
+    .
+  },
+  nombreBeneficiario2: 'NA',
+  tipoCuentaBeneficiario2: 1,
+  cuentaBeneficiario2: '123456789'
+}
+```
+
+Atributo | TipoDato
+-------- | --------
+idLote | ***string***
+idMensaje | ***string***
+monto | ***number***
+concepto | ***string***
+referenciaNumerica | ***number***
+tipoPago | ***number***
+fechaSolicitud | ***string***
+fechaVencimiento | ***string***
+informacionAdicional | ***object***
+nombreBeneficiario2 | ***string***
+tipoCuentaBeneficiario2 | ***number*** <br> ***string*** 'NA' en caso que no aplique
+cuentaBeneficiario2 | ***number*** <br> ***string*** 'NA' en caso que no aplique
+
+## Response Consulta QR Sincrono 
+
+```
+{
+  idLote: 'lote3',
+  lista: [ ... ],
+  size: 5,
+  page: 5,
+  codigoResultado: 200,
+  textoResultado: 'Success'
+}
+```
+
+Atributo | TipoDato
+-------- | --------
+idLote | ***string***
+lista | [***Array***](#generación-qr)
+size | ***number***
+page | ***number***
+codigoResuktado | ***number***
+textoResultado | ***string***
+
+## Envio de Lote 
+
+```
+{
+  idLote: 'lote3',
+  tipoPago: 20,
+  fechaSolicitud: '2019-12-17T18:25:43.511Z',
+  lote: [
+    ...
+  ]
+}
+```
+
+Atributo | TipoDato
+-------- | --------
+idLote | ***string***
+lote | [***Array***](#generación-qr)
+tipoPago | ***number***
+fechaSolicitud | ***DATE***
+
+## Request Envio Respuesta
+
+```
+{
+  idLote: 'lote3',
+  idMensaje: 'mensaje2',
+  estadoMensaje: 'Procesado',
+  horaProcesamientoMC: '2019-12-17T18:25:43.511Z',
+  informacionAdicional: [
+    ...
+  ],
+  signature: 'asdfghj'
+}
+```
+
+Atributo | TipoDato
+-------- | --------
+idLote | ***string***
+idMensaje | ***string***
+estadoMensaje | ***string***
+horaProcesamientoMC | ***DATE***
+informacionAdicional | ***object***
+signature | ***string***
+
+## Request Envia Respuesta QR
+
+```
+{
+  idLote: 'lote3',
+  lista: [...],
+  signature: 'asdfghj'
+}
+```
+
+Atributo | TipoDato
+-------- | --------
+idLote | ***string***
+lista | [***Array***](#request-envio-respuesta)
+signature | ***string***
+
+## Request Generacion QR Asincrono
+
+```
+{
+  idLote: 'lote3',
+  idMensaje: '1234567891-2',
+  monto: 123.45,
+  concepto: 'Pago Codi',
+  referenciaNumerica: 12323,
+  tipoPago: 20,
+  fechaSolicitud: '2012-04-23T18:25:43.511Z',
+  fechaVencimiento: '2012-04-23T18:25:43.511Z',
+  informacionAdicional: {
+    campoPrueba: 'Probando...'
+  },
+  nombreBeneficiario2: 'NA',
+  tipoCuentaBeneficiario2: 'NA',
+  cuentaBeneficiario2: 'NA'
+}
+```
+Atributo | Tipo
+-------- | ----
+idLote | ***string***
+idMensaje | ***string***
+monto | ***number***
+concepto |  ***string***
+referenciaNumerica | ***number***
+tipoPago | ***number***
+fechaSolicitud | ***DATE***
+fechaVencimiento | ***DATE***
+informacionAdicional | ***object***
+nombreBeneficiario2 |  ***string***
+tipoCuentaBeneficiario2 | ***number***
+cuentaBeneficiaro2 | ***string***
+
+
